@@ -1,0 +1,54 @@
+#!/usr/bin/python
+
+import sys
+import subprocess
+
+vbm = "/usr/local/bin/VBoxManage"
+cmds = ["start", "shutdown", "pause", "resume", "list", "ip"]
+
+
+def print_usage():
+    print('===================================================')
+    print("Usage: " + sys.argv[0] + " [cmd]")
+    print("cmd:")
+    for cmd in cmds:
+        print("  " + cmd)
+    print('===================================================')
+
+
+def handle(argv):
+    cmd = argv[1]
+    if cmd not in cmds:
+        print_usage()
+        exit(0)
+
+    if cmd == cmds[4]:
+        subprocess.call(vbm + " list runningvms", shell=True)
+        return
+
+    if len(argv) < 3:
+        return "too few param"
+
+    vm = argv[2]
+    try:
+        if cmd == cmds[0]:
+            return subprocess.check_output(vbm + " startvm " + vm + " --type headless", shell=True)
+        if cmd == cmds[1]:
+            return subprocess.check_output(vbm + " controlvm " + vm + " poweroff", shell=True)
+        if cmd == cmds[2]:
+            return subprocess.check_output(vbm + " controlvm " + vm + " pause", shell=True)
+        if cmd == cmds[3]:
+            return subprocess.check_output(vbm + " controlvm " + vm + " resume", shell=True)
+        if cmd == cmds[5]:
+            return subprocess.check_output(vbm + " guestproperty enumerate " + vm +
+                                           " | grep '/Net/*/./V4/IP'"
+                                           " | awk '{print $4}'"
+                                           " | sed 's/,/ /g'", shell=True)
+    except Exception as e:
+        return e.message
+
+if len(sys.argv) < 2:
+    print_usage()
+else:
+    ret = handle(sys.argv)
+    print(ret if ret else "")

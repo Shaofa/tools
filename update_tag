@@ -1,0 +1,28 @@
+#! /bin/sh
+
+# This demo script will find the modified files in your project,
+# and generate a ctags file and cscope database for these files.
+# This script is NOT tested yet!
+# by Easwy Yang, 2009/03/29
+
+if [ $# -ne 1 ]; then
+    echo 'too few args!'
+    exit 0
+fi
+
+# vars
+PRJ_DIR=$1
+SRC_LIST=src_file_list
+
+FIND=/usr/bin/find
+CTAGS=/usr/bin/ctags
+
+# find modified files
+# you can modify this command to exclude the object files, etc.
+${FIND} ${PRJ_DIR} -name "*.[chmk]" -type f > ${SRC_LIST}
+
+# generate tag file
+${CTAGS} -L ${SRC_LIST}
+
+
+rm ${SRC_LIST} -rf

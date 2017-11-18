@@ -1,0 +1,9 @@
+#!/bin/sh
+
+patten_ip="[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}"
+
+ip=$(vbox ip ubuntu | grep "${patten_ip}")
+
+if [ -n $ip ];then
+    sed -i "19s/${patten_ip}/${ip}/" ~/.ssh/config
+fi

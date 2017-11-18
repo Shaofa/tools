@@ -1,0 +1,54 @@
+#!/usr/bin/python
+import argparse
+import sys
+import subprocess
+
+LOCAL_DIR = '~/workspace/sshfs_root'
+
+args = {
+    'kfc': {
+        'dst_dir': '{}/kfc'.format(LOCAL_DIR),
+        'src_dir': '/home/shaofa.lsf/workspace'
+    },
+    'vm': {
+        'dst_dir': '{}/vm'.format(LOCAL_DIR),
+        'src_dir': '/home/shaofa/workspace'
+    },
+    'pi': {
+        'dst_dir': '{}/pi'.format(LOCAL_DIR),
+        'src_dir': '/home/pi/workspace'
+    },
+    'lab2': {
+        'dst_dir': '{}/lab2'.format(LOCAL_DIR),
+        'src_dir': '/home/iot/workspace'
+    },
+    'lab1': {
+        'dst_dir': '{}/lab1'.format(LOCAL_DIR),
+        'src_dir': '/home/iot/workspace'
+    }
+}
+
+parser = argparse.ArgumentParser()
+parser.add_argument('operator',choices={'mount','umount'}, help='mount/umount sshfs')
+parser.add_argument('name', choices=args.keys())
+opt = parser.parse_args(sys.argv[1:])
+
+if opt.operator == "mount":
+    try:
+        print('try to mount...')
+        cmd = 'sshfs {}:{} {} -o PubkeyAuthentication=yes' \
+            .format(opt.name, args[opt.name]['src_dir'], args[opt.name]['dst_dir'])
+        subprocess.check_call(cmd, shell=True)
+        print('success!')
+    except:
+        print('try to umount first...')
+        cmd1 = "umount {0}".format(args[opt.name]['dst_dir'])
+        subprocess.check_call(cmd1, shell=True)
+        print('try to mount again...')
+        subprocess.check_call(cmd, shell=True)
+        print('success!')
+else:
+    cmd = "umount {0}".format(args[opt.name]['dst_dir'])
+    subprocess.call(cmd, shell=True)
+    print('success!')
+
